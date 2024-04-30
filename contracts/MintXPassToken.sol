@@ -8,12 +8,59 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MintXPassToken is ERC721Enumerable, Ownable {
     uint constant public MAX_TOKEN_COUNT = 1000;
+    string public tokenName = "XPassToken";
+    string public tokenSymbol = "XPT";
+    string public metadataURI = "https://gametok.co.kr/metadata/json/sample";
+
+    // 10^18 Peb = 1 Klay ( 10^20 = 0.01 klay)
+    uint public xPassTokenPrice = 100000000000000000000;
+
 
     string baseURI;
     string notRevealedUri;
     bool public revealed = false;
     bool public publicMintEnabled = false;
 
+    ////////////////////////////////////////////////////////////////////////////////
+    //for whitelist
+    mapping(address => uint) private map_addr;
+    bool use_whitelist = true;
+    uint count = 0;
+
+    function is_whitelist(address addr) public view returns(uint) {
+        return map_addr[addr];
+    }
+
+    function is_whitelist_2() public view returns(uint) {
+        return map_addr[msg.sender];
+    }
+
+    function add_whitelist(address a) public onlyOwner {
+        require(map_addr[a] == 0);
+
+        map_addr[a] = 1;
+    }
+    
+    function del_whitelist(address a) public onlyOwner {
+        require(map_addr[a] != 0);
+
+        // map_data[a] = 0;
+        delete map_addr[a];
+    }
+
+    function set_use_whitelist(bool b) public onlyOwner {
+        use_whitelist = b;
+    }
+    
+    function mint_a() public {
+        if(use_whitelist) {
+            require(is_whitelist_2() != 0);
+        }
+
+        count++;
+        // _mint(no, link);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////
     function _baseURI() override internal view returns (string memory) {
       return baseURI;
     }
@@ -33,14 +80,14 @@ contract MintXPassToken is ERC721Enumerable, Ownable {
     function reveal(bool _state) public onlyOwner{
       revealed = _state;
     }
-
-    string public metadataURI;
-
-    // 10^18 Peb = 1 Klay
-    uint public xPassTokenPrice = 1000000000000000000;
-
+    ////////////////////////////////////////////////////////////////////////////////////////
+    /*
     constructor (string memory _name, string memory _symbol, string memory _metadataURI) Ownable(msg.sender) ERC721(_name, _symbol) {
         metadataURI = _metadataURI;
+    }
+    */
+    constructor () Ownable(msg.sender) ERC721("XPassTicket", "XPT") {
+      //metadataURI = "https://gametok.co.kr/metadata/json/sample";
     }
 
     function tokenURI(uint _tokenId) override public view returns (string memory) {
@@ -58,7 +105,7 @@ contract MintXPassToken is ERC721Enumerable, Ownable {
 
     _mint(msg.sender, tokenId);
   }
-
+  //////////////////////////////////////////////////////////////////////////////////////
   function safeMint(address to) public onlyOwner {
         //uint256 tokenId = _tokenIdCounter.current();
         //_tokenIdCounter.increment();
@@ -73,5 +120,6 @@ contract MintXPassToken is ERC721Enumerable, Ownable {
             safeMint(to);
         }
   }
+  
 
 }
