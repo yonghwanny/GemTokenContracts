@@ -2,19 +2,17 @@
 
 pragma solidity ^0.8.20;
 
-import "MintGemToken.sol";
+import "./MintXPassToken.sol";
 
-contract SaleGemToken {
-    MintGemToken public mintGemToken;
+contract SaleXPassToken {
+    MintXPassToken public mintXPassToken;
 
-    constructor(address _mintGemToken) {
-        mintGemToken = MintGemToken(_mintGemToken);
+    constructor(address _mintXPassToken) {
+        mintXPassToken = MintXPassToken(_mintXPassToken);
     }
 
-    struct GemTokenData {
+    struct XPassTokenData {
         uint tokenId;
-        uint gemTokenRank;
-        uint gemTokenType;
         uint tokenPrice;
     }
 
@@ -22,29 +20,29 @@ contract SaleGemToken {
 
     uint[] public onSaleTokens;
 
-    function setForSaleGemToken(uint _tokenId, uint _price) public {
-        address tokenOwner = mintGemToken.ownerOf(_tokenId);
+    function setForSaleXPassToken(uint _tokenId, uint _price) public {
+        address tokenOwner = mintXPassToken.ownerOf(_tokenId);
 
-        require(tokenOwner == msg.sender, "Caller is not Gem token owner.");
+        require(tokenOwner == msg.sender, "Caller is not XPass token owner.");
         require(_price > 0, "Price is zero or lower.");
-        require(tokenPrices[_tokenId] == 0, "This Gem token is already on sale.");
-        require(mintGemToken.isApprovedForAll(msg.sender, address(this)), "Gem token onwer did not approve token.");
+        require(tokenPrices[_tokenId] == 0, "This XPass token is already on sale.");
+        require(mintXPassToken.isApprovedForAll(msg.sender, address(this)), "XPass token onwer did not approve token.");
 
         tokenPrices[_tokenId] = _price;
 
         onSaleTokens.push(_tokenId);
     }
 
-    function purchaseGemToken(uint _tokenId) public payable {
-        address tokenOwner = mintGemToken.ownerOf(_tokenId);
+    function purchaseXPassToken(uint _tokenId) public payable {
+        address tokenOwner = mintXPassToken.ownerOf(_tokenId);
 
-        require(tokenOwner != msg.sender, "Caller is Gem token owner.");
-        require(tokenPrices[_tokenId] > 0, "This Gem token not sale.");
+        require(tokenOwner != msg.sender, "Caller is XPass token owner.");
+        require(tokenPrices[_tokenId] > 0, "This XPass token not sale.");
         require(tokenPrices[_tokenId] <= msg.value, "Caller sent lower than price.");
 
         payable(tokenOwner).transfer(msg.value);
 
-        mintGemToken.safeTransferFrom(tokenOwner, msg.sender, _tokenId);
+        mintXPassToken.safeTransferFrom(tokenOwner, msg.sender, _tokenId);
 
         tokenPrices[_tokenId] = 0;
 
@@ -60,55 +58,54 @@ contract SaleGemToken {
         }
     }
 
-    function getGemTokens(address _tokenOwner) public view returns(GemTokenData[] memory) {
-        uint balanceLength = mintGemToken.balanceOf(_tokenOwner);
+    function getXPassTokens(address _tokenOwner) public view returns(XPassTokenData[] memory) {
+        uint balanceLength = mintXPassToken.balanceOf(_tokenOwner);
 
         require(balanceLength > 0, "Token owner did not have token.");
 
-        GemTokenData[] memory gemTokens = new GemTokenData[](balanceLength);
+        XPassTokenData[] memory xPassTokens = new XPassTokenData[](balanceLength);
 
         for(uint i = 0; i < balanceLength; i++) {
-            uint tokenId = mintGemToken.tokenOfOwnerByIndex(_tokenOwner, i);
+            uint tokenId = mintXPassToken.tokenOfOwnerByIndex(_tokenOwner, i);
             
-            (uint gemTokenRank, uint gemTokenType, uint tokenPrice) = getGemTokenInfo(tokenId);
+            (uint tokenPrice) = getXPassTokenInfo(tokenId);
 
-            gemTokens[i] = GemTokenData(tokenId, gemTokenRank, gemTokenType, tokenPrice);
+            xPassTokens[i] = XPassTokenData(tokenId, tokenPrice);
         }
 
-        return gemTokens;
+        return xPassTokens;
     }
 
-    function getSaleGemTokens() public view returns(GemTokenData[] memory) {
+    function getSaleXPassTokens() public view returns(XPassTokenData[] memory) {
         require(onSaleTokens.length > 0, "Not exist on sale token.");
 
-        GemTokenData[] memory gemTokens = new GemTokenData[](onSaleTokens.length);
+        XPassTokenData[] memory xPassTokens = new XPassTokenData[](onSaleTokens.length);
 
         for(uint i = 0; i < onSaleTokens.length; i++) {
             uint tokenId = onSaleTokens[i];
 
-            (uint gemTokenRank, uint gemTokenType, uint tokenPrice) = getGemTokenInfo(tokenId);
+            (uint tokenPrice) = getXPassTokenInfo(tokenId);
 
-            gemTokens[i] = GemTokenData(tokenId, gemTokenRank, gemTokenType, tokenPrice);
+            xPassTokens[i] = XPassTokenData(tokenId, tokenPrice);
         }
 
-        return gemTokens;
+        return xPassTokens;
     }
 
-    function getLatestMintedGemToken(address _tokenOwner) public view returns(GemTokenData memory) {
-        uint balanceLength = mintGemToken.balanceOf(_tokenOwner);
+    function getLatestMintedXPassToken(address _tokenOwner) public view returns(XPassTokenData memory) {
+        uint balanceLength = mintXPassToken.balanceOf(_tokenOwner);
 
-        uint tokenId = mintGemToken.tokenOfOwnerByIndex(_tokenOwner, balanceLength - 1);
+        uint tokenId = mintXPassToken.tokenOfOwnerByIndex(_tokenOwner, balanceLength - 1);
 
-        (uint gemTokenRank, uint gemTokenType, uint tokenPrice) = getGemTokenInfo(tokenId);
+        ( uint tokenPrice) = getXPassTokenInfo(tokenId);
 
-        return GemTokenData(tokenId, gemTokenRank, gemTokenType, tokenPrice);
+        return XPassTokenData(tokenId, tokenPrice);
     }
 
-    function getGemTokenInfo(uint _tokenId) public view returns(uint, uint, uint) {
-        uint gemTokenRank = mintGemToken.getGemTokenRank(_tokenId);
-        uint gemTokenType = mintGemToken.getGemTokenType(_tokenId);
+    function getXPassTokenInfo(uint _tokenId) public view returns(uint) {
+  
         uint tokenPrice = tokenPrices[_tokenId];
 
-        return (gemTokenRank, gemTokenType, tokenPrice);
+        return (tokenPrice);
     } 
 }

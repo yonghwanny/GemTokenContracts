@@ -12,8 +12,8 @@ contract MintXPassToken is ERC721Enumerable, Ownable {
     string public tokenSymbol = "XPT";
     string public metadataURI = "https://gametok.co.kr/metadata/json/sample";
 
-    // 10^18 Peb = 1 Klay ( 10^20 = 0.01 klay)
-    uint public xPassTokenPrice = 100000000000000000000;
+    // 10^18 Peb = 1 Klay ( 10^16 = 0.01 klay)
+    uint public xPassTokenPrice = 10000000000000000;
 
 
     string baseURI;
@@ -86,8 +86,10 @@ contract MintXPassToken is ERC721Enumerable, Ownable {
         metadataURI = _metadataURI;
     }
     */
-    constructor () Ownable(msg.sender) ERC721("XPassTicket", "XPT") {
+    constructor () Ownable(msg.sender) ERC721(tokenName, tokenSymbol) {
       //metadataURI = "https://gametok.co.kr/metadata/json/sample";
+      address a = msg.sender;
+      map_addr[a] = 1;
     }
 
     function tokenURI(uint _tokenId) override public view returns (string memory) {
@@ -96,6 +98,9 @@ contract MintXPassToken is ERC721Enumerable, Ownable {
   }
 
   function mintXPassToken() public payable {
+    if(use_whitelist) {
+      require(is_whitelist_2() != 0);
+    }
     require(xPassTokenPrice <= msg.value, "Not enough Klay.");
     require(MAX_TOKEN_COUNT > totalSupply(), "No more minting is possible.");
 
@@ -106,7 +111,10 @@ contract MintXPassToken is ERC721Enumerable, Ownable {
     _mint(msg.sender, tokenId);
   }
   //////////////////////////////////////////////////////////////////////////////////////
-  function safeMint(address to) public onlyOwner {
+  function safeMint(address to) public {
+     if(use_whitelist) {
+      require(is_whitelist_2() != 0);
+    }
         //uint256 tokenId = _tokenIdCounter.current();
         //_tokenIdCounter.increment();
         require(MAX_TOKEN_COUNT > totalSupply(), "No more minting is possible.");
@@ -115,7 +123,11 @@ contract MintXPassToken is ERC721Enumerable, Ownable {
         _safeMint(to, tokenId);
   }
 
-  function batchMint(address to, uint amount) public onlyOwner{
+  function batchMint(address to, uint amount) public {
+    if(use_whitelist) {
+      require(is_whitelist_2() != 0);
+    }
+
         for (uint i = 0; i < amount; i++) {
             safeMint(to);
         }
