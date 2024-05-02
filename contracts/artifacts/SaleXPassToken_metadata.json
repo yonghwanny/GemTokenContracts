@@ -345,11 +345,11 @@
 			]
 		},
 		"contracts/MintXPassToken.sol": {
-			"keccak256": "0xb03f611dda6f24d3bbf729fdef9446701ae50a2338ba12b7696d25603f25a38c",
+			"keccak256": "0x8bfd150b43ae3281a78940ba6b516251d78e039463d913d19ae54f2d8f2a466a",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://2d93a49ad6a7fa628efe996c236f948c71699aab5b2a1d2d018005cd0a0bd139",
-				"dweb:/ipfs/QmbtG7QmrSVK9GdWZgQoAYUEMq67XymQpABrWGrjbGqFmM"
+				"bzz-raw://a6503b073baf3e2a6329f6ca702688b6f2f22f9d79a453d46dabace445deb254",
+				"dweb:/ipfs/QmaLVAnLygtmi2TBhPVkFMDPYjAEFZMMcMSasbVdWzgKun"
 			]
 		},
 		"contracts/SaleXPassNft.sol": {

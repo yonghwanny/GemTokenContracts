@@ -12,8 +12,8 @@ contract MintXPassToken is ERC721Enumerable, Ownable {
     string public tokenSymbol = "XPT";
     string public metadataURI = "https://gametok.co.kr/metadata/json/sample";
 
-    // 10^18 Peb = 1 Klay ( 10^16 = 0.01 klay)
-    uint public xPassTokenPrice = 10000000000000000;
+    // 10^18 Peb = 1 Klay ( 10^14 = 0.0001 klay)
+    uint public xPassTokenPrice = 100000000000000;
 
 
     string baseURI;
